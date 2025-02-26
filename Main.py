@@ -64,7 +64,7 @@ def start(message: Message):
 # ------------------------ callback query handler ----------------------
 
 
-@bot.callback_query_handler(lambda query: query.data  == 'investments')
+@bot.callback_query_handler(lambda query: query.data == 'investments')
 def investments_handler(callback: CallbackQuery):
     bot.send_message(callback.message.chat.id, 'investments')
 
@@ -98,7 +98,9 @@ def cal(c: CallbackQuery):
                               c.message.message_id,
                               reply_markup=key)
     elif result:
-        calendar, step = WMonthTelegramCalendar(calendar_id=2).build()
+        result_list = str(result).split('-')
+        calendar, step = WMonthTelegramCalendar(calendar_id=2, min_date=datetime.date(
+            int(result_list[0]), int(result_list[1]), int(result_list[2]) + 1)).build()
         rent_request['come'] = result
         bot.send_message(c.message.chat.id,
                          'Оберіть день виїзду', reply_markup=calendar)
@@ -114,6 +116,7 @@ def cal(c: CallbackQuery):
                               reply_markup=key)
     elif result:
         rent_request['leave'] = result
+        print(result)
         bot.send_message(c.message.chat.id,
                          f"Ви заїзжаєте о {rent_request['come']}, а виїзжаєте о {rent_request['leave']}")
 
