@@ -33,6 +33,17 @@ def reply_start_command(message: Message):
                      reply_markup=markup)
 
 
+@bot.message_handler(commands=['book'])
+def photo_resp(message: Message):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton(text='Забронювати', callback_data='rent'))
+    bd_resp = get_data_from_database()
+    for glamp in bd_resp:
+        bot.send_photo(message.chat.id, glamp[1], caption=f"""{glamp[2]}
+Ціна : {glamp[3]}$
+Розмір : {glamp[4]}кв. м.""", reply_markup=markup)
+
+
 @bot.message_handler(commands=['contacts'])
 def contacts_handler(message: Message):
     markup = InlineKeyboardMarkup(row_width=1)
@@ -60,14 +71,22 @@ def contacts_handler(message: Message):
 #     bot.send_photo(message.chat.id, )
 
 
-@bot.message_handler(commands=['book'])
-def start(message: Message):
-    calendar, step = WMonthTelegramCalendar(calendar_id=1).build()
-    bot.send_message(message.chat.id,
-                     'Оберіть день заїзду',
-                     reply_markup=calendar)
+# @bot.message_handler(commands=['book'])
+# def start(message: Message):
+#     calendar, step = WMonthTelegramCalendar(calendar_id=1).build()
+#     bot.send_message(message.chat.id,
+#                      'Оберіть день заїзду',
+#                      reply_markup=calendar)
 
 # ------------------------ callback query handler ----------------------
+
+
+@bot.callback_query_handler(lambda query: query.data == 'rent')
+def rent_handler(callback: CallbackQuery):
+    calendar, step = WMonthTelegramCalendar(calendar_id=1).build()
+    bot.send_message(callback.from_user.id,
+                     'Оберіть день заїзду',
+                     reply_markup=calendar)
 
 
 @bot.callback_query_handler(lambda query: query.data == 'investments')
@@ -127,17 +146,6 @@ def cal(c: CallbackQuery):
                          f"Ви заїзжаєте о {rent_request['come']}, а виїзжаєте о {rent_request['leave']}")
 
 # photo example command
-
-
-@bot.message_handler(commands=['photo'])
-def photo_resp(message: Message):
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton(text='Забронювати', callback_data='rent'))
-    bd_resp = get_data_from_database()
-    for glamp in bd_resp:
-        bot.send_photo(message.chat.id, glamp[1], caption=f"""{glamp[2]}
-Ціна : {glamp[3]}$
-Розмір : {glamp[4]}кв. м.""", reply_markup=markup)
 
 
 bot.infinity_polling()
