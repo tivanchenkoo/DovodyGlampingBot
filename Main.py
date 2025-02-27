@@ -3,6 +3,8 @@ from api_key import API_KEY
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from telegram_bot_calendar import DetailedTelegramCalendar, WMonthTelegramCalendar,  LSTEP
 import datetime
+from database_function import get_data_from_database
+
 
 bot = telebot.TeleBot(API_KEY)
 
@@ -52,6 +54,10 @@ def contacts_handler(message: Message):
 /cancel – Скасувати броню
 /contacts – Контакти та адреса
 """)
+
+# @bot.message_handler(commands=['photo'])
+# def send_photo(message : Message):
+#     bot.send_photo(message.chat.id, )
 
 
 @bot.message_handler(commands=['book'])
@@ -119,6 +125,19 @@ def cal(c: CallbackQuery):
         print(result)
         bot.send_message(c.message.chat.id,
                          f"Ви заїзжаєте о {rent_request['come']}, а виїзжаєте о {rent_request['leave']}")
+
+# photo example command
+
+
+@bot.message_handler(commands=['photo'])
+def photo_resp(message: Message):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton(text='Забронювати', callback_data='rent'))
+    bd_resp = get_data_from_database()
+    for glamp in bd_resp:
+        bot.send_photo(message.chat.id, glamp[1], caption=f"""{glamp[2]}
+Ціна : {glamp[3]}$
+Розмір : {glamp[4]}кв. м.""", reply_markup=markup)
 
 
 bot.infinity_polling()
