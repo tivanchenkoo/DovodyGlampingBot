@@ -140,10 +140,28 @@ def cal(c: CallbackQuery):
                               c.message.message_id,
                               reply_markup=key)
     elif result:
+        print('yay')
+        markup = InlineKeyboardMarkup(row_width=1)
+        btn1 = InlineKeyboardButton('1️⃣', callback_data='1')
+        btn2 = InlineKeyboardButton('2️⃣', callback_data='2')
+        btn3 = InlineKeyboardButton('3️⃣', callback_data='3')
+        btn4 = InlineKeyboardButton('4️⃣', callback_data='4')
+        btn5 = InlineKeyboardButton('5️⃣', callback_data='5')
+        markup.add(btn1, btn2, btn3, btn4, btn5)
+
         rent_request['leave'] = result
-        print(result)
         bot.send_message(c.message.chat.id,
-                         f"Ви заїзжаєте о {rent_request['come']}, а виїзжаєте о {rent_request['leave']}")
+                         f"Скільки гостей проживатиме?", reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda query: query.data == '1' or query.data == '2' or query.data == '3' or query.data == '4' or query.data == '5')
+def number_handler(callback: CallbackQuery):
+    bot.send_message(callback.from_user.id, f"""Повідомлення: "Вибрано: А-фрейм «Лісовий»
+Дата: {rent_request['come']} - {rent_request['leave']}
+Гості: {callback.data}
+Вартість: 100$
+Підтверджуєте броню?
+""")
 
 # photo example command
 
