@@ -75,7 +75,7 @@ def investments_handler(callback: CallbackQuery):
 /book – Розпочати бронювання
 /my_bookings – Мої броні
 /cancel – Скасувати броню
-/contacts – Контакти та адреса
+/contacts – Контакти та адреса  
 """)
 
 
