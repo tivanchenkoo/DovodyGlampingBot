@@ -23,7 +23,7 @@ def reply_start_command(message: Message):
     markup = InlineKeyboardMarkup(row_width=1)
     btn1 = InlineKeyboardButton(
         "🏕 Переглянути доступні А-фрейми", callback_data='seeprojects')
-    btn2 = InlineKeyboardButton("📅 Забронювати", callback_data='investments')
+    btn2 = InlineKeyboardButton("📅 Забронювати", callback_data='rent')
     btn3 = InlineKeyboardButton("❓ Допомога", callback_data='help')
     btn4 = InlineKeyboardButton("📞 Контакти", callback_data='contacts')
     markup.add(btn1, btn2, btn3, btn4)
@@ -118,7 +118,7 @@ def investments_handler(callback: CallbackQuery):
 def cal(c: CallbackQuery):
     result, key, step = WMonthTelegramCalendar(calendar_id=1).process(c.data)
     if not result and key:
-        bot.edit_message_text('Оберіть день заїзду',
+        bot.edit_message_text("Оберіть день заїзду",
                               c.message.chat.id,
                               c.message.message_id,
                               reply_markup=key)
@@ -128,14 +128,14 @@ def cal(c: CallbackQuery):
             int(result_list[0]), int(result_list[1]), int(result_list[2]) + 1)).build()
         rent_request['come'] = result
         bot.send_message(c.message.chat.id,
-                         'Оберіть день виїзду', reply_markup=calendar)
+                         "Оберіть день виїзду", reply_markup=calendar)
 
 
 @bot.callback_query_handler(func=WMonthTelegramCalendar.func(calendar_id=2))
 def cal(c: CallbackQuery):
     result, key, step = WMonthTelegramCalendar(calendar_id=2).process(c.data)
     if not result and key:
-        bot.edit_message_text('Оберіть день виїзду',
+        bot.edit_message_text("Оберіть день виїзду",
                               c.message.chat.id,
                               c.message.message_id,
                               reply_markup=key)
@@ -162,8 +162,6 @@ def number_handler(callback: CallbackQuery):
 Вартість: 100$
 Підтверджуєте броню?
 """)
-
-# photo example command
 
 
 bot.infinity_polling()
