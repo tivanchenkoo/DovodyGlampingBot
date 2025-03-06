@@ -4,16 +4,22 @@ from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, C
 from telegram_bot_calendar import DetailedTelegramCalendar, WMonthTelegramCalendar,  LSTEP
 import datetime
 from database_function import get_data_from_database
-
+from calenar import generate_month_selector, generate_date_selector, generate_callback_month_selector
+import json
+import calendar
 
 bot = telebot.TeleBot(API_KEY)
 
 current_date = datetime.datetime.today().strftime('%Y-%m-%d').split('-')
 
+
 rent_request = {
     'come': None,
-    'leave': None
+    'leave': None,
+    'glamp_id': None,
 }
+
+glamp_messages_id = []
 
 # --------------------- message_handler ----------------------
 
@@ -35,13 +41,15 @@ def reply_start_command(message: Message):
 
 @bot.message_handler(commands=['book'])
 def photo_resp(message: Message):
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton(text='Забронювати', callback_data='rent'))
     bd_resp = get_data_from_database()
     for glamp in bd_resp:
-        bot.send_photo(message.chat.id, glamp[1], caption=f"""{glamp[2]}
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton(
+            text='Забронювати', callback_data=f"rent_{glamp[0]}"))
+        photo_message = bot.send_photo(message.chat.id, glamp[1], caption=f"""{glamp[2]}
 Ціна : {glamp[3]}$
 Розмір : {glamp[4]}кв. м.""", reply_markup=markup)
+        glamp_messages_id.append(photo_message.id)
 
 
 @bot.message_handler(commands=['contacts'])
@@ -81,12 +89,17 @@ def contacts_handler(message: Message):
 # ------------------------ callback query handler ----------------------
 
 
-@bot.callback_query_handler(lambda query: query.data == 'rent')
+@bot.callback_query_handler(lambda query: query.data.startswith('rent_'))
 def rent_handler(callback: CallbackQuery):
-    calendar, step = WMonthTelegramCalendar(calendar_id=1).build()
+    rent_request['glamp_id'] = callback.data.split('_')[1]
+    for id in glamp_messages_id:
+        try:
+            bot.delete_message(callback.from_user.id, id)
+        except Exception:
+            pass
     bot.send_message(callback.from_user.id,
-                     'Оберіть день заїзду',
-                     reply_markup=calendar)
+                     'Оберіть дату заїзду',
+                     reply_markup=generate_month_selector())
 
 
 @bot.callback_query_handler(lambda query: query.data == 'investments')
@@ -140,7 +153,6 @@ def cal(c: CallbackQuery):
                               c.message.message_id,
                               reply_markup=key)
     elif result:
-        print('yay')
         markup = InlineKeyboardMarkup(row_width=1)
         btn1 = InlineKeyboardButton('1️⃣', callback_data='1')
         btn2 = InlineKeyboardButton('2️⃣', callback_data='2')
@@ -154,6 +166,25 @@ def cal(c: CallbackQuery):
                          f"Скільки гостей проживатиме?", reply_markup=markup)
 
 
+@bot.callback_query_handler(func=lambda query: query.data.startswith('date_') or query.data.startswith('date2_'))
+def calendar_handler(callback: CallbackQuery):
+    month = callback.data.split('_')[1]
+    date = callback.data.split('_')[2]
+    if callback.data.startswith('date_'):
+        rent_request['come'] = datetime.date(datetime.datetime.now(
+        ).year, list(calendar.month_name).index(month), int(date))
+    if callback.data.startswith('date2_'):
+        rent_request['leave'] = datetime.date(datetime.datetime.now(
+        ).year, list(calendar.month_name).index(month), int(date))
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    if callback.data.startswith('date_'):
+        bot.send_message(callback.from_user.id, 'Оберіть дату заїзду',
+                         reply_markup=generate_callback_month_selector(month, date))
+    elif callback.data.startswith('date2_'):
+        bot.send_message(callback.from_user.id,
+                         f"Ви замовили глемп від {rent_request['come']} до {rent_request['leave']}")
+
+
 @bot.callback_query_handler(func=lambda query: query.data == '1' or query.data == '2' or query.data == '3' or query.data == '4' or query.data == '5')
 def number_handler(callback: CallbackQuery):
     bot.send_message(callback.from_user.id, f"""Повідомлення: "Вибрано: А-фрейм «Лісовий»
@@ -162,6 +193,18 @@ def number_handler(callback: CallbackQuery):
 Вартість: 100$
 Підтверджуєте броню?
 """)
+
+
+@bot.callback_query_handler(func=lambda query: query.data.startswith('calendar_') or query.data.startswith('calendar2_'))
+def month_selector_handler(callback: CallbackQuery):
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    if callback.data.startswith('calendar_'):
+        bot.send_message(callback.from_user.id, "choose date", reply_markup=generate_date_selector(
+            callback.data.split('_')[1], rent_request['glamp_id']))
+    elif callback.data.startswith('calendar2_'):
+        bot.send_message(callback.from_user.id, "choose date", reply_markup=generate_date_selector(
+            callback.data.split('_')[1], rent_request['glamp_id'], callback.data.split('_')[2], callback.data.split('_')[3]))
+
 
 
 bot.infinity_polling()

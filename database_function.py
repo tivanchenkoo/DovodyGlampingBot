@@ -6,7 +6,6 @@ import json
 DB_NAME = 'sqlite.db'
 
 
-
 def generate_month_booking():
     year_data = {}
     year = datetime.now().year
@@ -16,17 +15,12 @@ def generate_month_booking():
             day_in_month = calendar.monthrange(year=year, month=month)
             month_dates = {}
             for date in range(day_in_month[1] + 1):
-                month_dates[date] = False
+                if date :
+                    month_dates[date] = False
             year_data[month_name[month]] = month_dates
 
     return year_data
 
-
-# {'february' : {
-#     '1' : True,
-#     '2' : False,
-#     '3' : True,
-# }}
 #                   REMOVE DATABASE
 # with sqlite3.connect(DB_NAME) as connection:
 #     sqlite_request = """DROP TABLE glamps """
@@ -53,6 +47,16 @@ def generate_month_booking():
 #     connection.execute(sqlite_request, (image, """Глемпінг біля річки "Лісова казка"
 
 # Цей затишний глемпінг розташований біля бушуючої річки, подалі від міста і усіх забот. Незабуваємий досвід для тебе і твоїх друзів або родини!""", 150, 40, json.dumps(generate_month_booking())))
+#     connection.commit()
+
+#                   SET_EXAMPLE_VAL2
+# with open('glampphoto.webp', 'rb') as image_connection:
+#     image = image_connection.read()
+# with sqlite3.connect(DB_NAME) as connection:
+#     sqlite_request = """INSERT INTO glamps (image, desc, price, size, rent_calendar) VALUES(?, ?, ?, ?, ?);"""
+#     connection.execute(sqlite_request, (image, """Глемпінг у лісі "Лісова казка"
+
+# Цей затишний глемпінг розташований серед густого лісу, подалі від міської метушні, і дарує ідеальний баланс між природою та комфортом.""", 100, 55, json.dumps(generate_month_booking())))
 #     connection.commit()
 
 
