@@ -102,6 +102,17 @@ def rent_handler(callback: CallbackQuery):
                      reply_markup=generate_month_selector())
 
 
+@bot.message_handler(commands=["faq"])
+def faq_handler(message):
+    markup = InlineKeyboardMarkup(row_width=1)
+    btn1 = InlineKeyboardButton("❔ Правила скасування", callback_data="rules")
+    btn2 = InlineKeyboardButton('🛠 Що взяти із собою?', callback_data="things")
+    btn3 = InlineKeyboardButton("🐶 Можна з вихованцями?", callback_data="pets")
+    markup.add(btn1, btn2, btn3)
+    bot.send_message(message.from_user.id,
+                     "Найчастіші питання:", reply_markup=markup)
+
+
 @bot.callback_query_handler(lambda query: query.data == 'investments')
 def investments_handler(callback: CallbackQuery):
     bot.send_message(callback.message.chat.id, 'investments')
@@ -205,6 +216,25 @@ def month_selector_handler(callback: CallbackQuery):
         bot.send_message(callback.from_user.id, "choose date", reply_markup=generate_date_selector(
             callback.data.split('_')[1], rent_request['glamp_id'], callback.data.split('_')[2], callback.data.split('_')[3]))
 
+
+@bot.callback_query_handler(lambda query: query.data == "rules")
+def rules_callback_handler(callback: CallbackQuery):
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    bot.send_message(callback.from_user.id,
+                     "Правила скасування:Ви можете скасувати ваше бронювання з повним поверненням коштів до 14 днів,після вже частинно")
+
+
+@bot.callback_query_handler(lambda query: query.data == "things")
+def things_callback_handler(callback):
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    bot.send_message(callback.from_user.id,
+                     "Що взяти із собою?-Радимо вам взяти із собою одяг,взуття та засоби гігієни")
+
+
+@bot.callback_query_handler(lambda query: query.data == "pets")
+def pets_callback_handler(callback):
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    bot.send_message(callback.from_user.id, "Можна з вихованцями?-Так можна")
 
 
 bot.infinity_polling()
