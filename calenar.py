@@ -23,16 +23,24 @@ def generate_month_selector():
 
 def generate_callback_month_selector(start_month, start_date):
     markup = InlineKeyboardMarkup(row_width=3)
-    chopped_month = []
     callback_month = calendar.month_name
+    _, days_in_start_month = calendar.monthrange(
+        datetime.now().year, list(callback_month).index(start_month))
     ukr_month = ['Січ', 'Лют', 'Бер', 'Квіт', 'Трав',
                  'Чер', 'Лип', 'Серп', 'Вер', 'Жов', 'Лист', 'Груд']
     buttons = []
     for i in range(13):
-        if callback_month[i]:
-            if i >= list(callback_month).index(start_month):
-                buttons.append(InlineKeyboardButton(
-                    text=ukr_month[i - 1], callback_data=f"calendar2_{callback_month[i]}_{start_month}_{start_date}"))
+        if int(start_date) >= days_in_start_month:
+            if callback_month[i]:
+                if i >= list(callback_month).index(start_month) + 1:
+                    buttons.append(InlineKeyboardButton(
+                        text=ukr_month[i - 1], callback_data=f"calendar2_{callback_month[i]}_{start_month}_{start_date}"))
+        else:
+            if callback_month[i]:
+                if i >= list(callback_month).index(start_month):
+                    buttons.append(InlineKeyboardButton(
+                        text=ukr_month[i - 1], callback_data=f"calendar2_{callback_month[i]}_{start_month}_{start_date}"))
+
     for i in range(0, len(buttons), 3):
         markup.add(*buttons[i:i+3])
     return markup
