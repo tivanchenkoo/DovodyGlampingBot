@@ -137,46 +137,6 @@ def investments_handler(callback: CallbackQuery):
 def investments_handler(callback: CallbackQuery):
     bot.send_message(callback.message.chat.id, 'contacts')
 
-
-@bot.callback_query_handler(func=WMonthTelegramCalendar.func(calendar_id=1))
-def cal(c: CallbackQuery):
-    result, key, step = WMonthTelegramCalendar(calendar_id=1).process(c.data)
-    if not result and key:
-        bot.edit_message_text("Оберіть день заїзду",
-                              c.message.chat.id,
-                              c.message.message_id,
-                              reply_markup=key)
-    elif result:
-        result_list = str(result).split('-')
-        calendar, step = WMonthTelegramCalendar(calendar_id=2, min_date=datetime.date(
-            int(result_list[0]), int(result_list[1]), int(result_list[2]) + 1)).build()
-        rent_request['come'] = result
-        bot.send_message(c.message.chat.id,
-                         "Оберіть день виїзду", reply_markup=calendar)
-
-
-@bot.callback_query_handler(func=WMonthTelegramCalendar.func(calendar_id=2))
-def cal(c: CallbackQuery):
-    result, key, step = WMonthTelegramCalendar(calendar_id=2).process(c.data)
-    if not result and key:
-        bot.edit_message_text("Оберіть день виїзду",
-                              c.message.chat.id,
-                              c.message.message_id,
-                              reply_markup=key)
-    elif result:
-        markup = InlineKeyboardMarkup(row_width=1)
-        btn1 = InlineKeyboardButton('1️⃣', callback_data='1')
-        btn2 = InlineKeyboardButton('2️⃣', callback_data='2')
-        btn3 = InlineKeyboardButton('3️⃣', callback_data='3')
-        btn4 = InlineKeyboardButton('4️⃣', callback_data='4')
-        btn5 = InlineKeyboardButton('5️⃣', callback_data='5')
-        markup.add(btn1, btn2, btn3, btn4, btn5)
-
-        rent_request['leave'] = result
-        bot.send_message(c.message.chat.id,
-                         f"Скільки гостей проживатиме?", reply_markup=markup)
-
-
 @bot.callback_query_handler(func=lambda query: query.data.startswith('date_') or query.data.startswith('date2_'))
 def calendar_handler(callback: CallbackQuery):
     month = callback.data.split('_')[1]
@@ -219,10 +179,22 @@ def month_selector_handler(callback: CallbackQuery):
 
 @bot.callback_query_handler(lambda query: query.data == "rules")
 def rules_callback_handler(callback: CallbackQuery):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('⬅️  Назад', callback_data='back_to_faq'))
     bot.delete_message(callback.from_user.id, callback.message.id)
     bot.send_message(callback.from_user.id,
-                     "Правила скасування:Ви можете скасувати ваше бронювання з повним поверненням коштів до 14 днів,після вже частинно")
+                     "Правила скасування:Ви можете скасувати ваше бронювання з повним поверненням коштів до 14 днів,після вже частинно", reply_markup=markup)
 
+@bot.callback_query_handler(lambda query: query.data == 'back_to_faq')
+def faq_handler(callback: CallbackQuery):
+    markup = InlineKeyboardMarkup(row_width=1)
+    bot.delete_message(callback.from_user.id, callback.message.id)
+    btn1 = InlineKeyboardButton("❔ Правила скасування", callback_data="rules")
+    btn2 = InlineKeyboardButton('🛠 Що взяти із собою?', callback_data="things")
+    btn3 = InlineKeyboardButton("🐶 Можна з вихованцями?", callback_data="pets")
+    markup.add(btn1, btn2, btn3)
+    bot.send_message(callback.from_user.id,
+                     "Найчастіші питання:", reply_markup=markup)
 
 @bot.callback_query_handler(lambda query: query.data == "things")
 def things_callback_handler(callback):

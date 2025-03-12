@@ -50,9 +50,13 @@ def generate_date_selector(month, glamp_id, start_month=None, start_date=None):
     week_first_day, days_in_month = calendar.monthrange(
         datetime.now().year, month_num)
     empty_btn = InlineKeyboardButton(' ', callback_data='ignore')
-    if start_month != month:
+    if start_month != month and not start_date:
         buttons = [InlineKeyboardButton(
             date, callback_data=f"date_{month}_{date}") if not dates[date] else InlineKeyboardButton(
+            '❌', callback_data='ignore') for date in dates.keys()]
+    elif start_month != month and start_date:
+        buttons = [InlineKeyboardButton(
+            date, callback_data=f"date2_{month}_{date}") if not dates[date] else InlineKeyboardButton(
             '❌', callback_data='ignore') for date in dates.keys()]
     elif start_month == month:
         buttons = [InlineKeyboardButton(
@@ -62,6 +66,18 @@ def generate_date_selector(month, glamp_id, start_month=None, start_date=None):
             buttons[i] = empty_btn
     for i in range(week_first_day):
         buttons.insert(0, empty_btn)
-    for i in range(0, len(dates), 7):
-        markup.add(*buttons[i:i + 7])
+    for i in range(0, len(dates) + week_first_day, 7):
+        try:
+            if buttons[i+7]:
+                markup.add(*buttons[i:i + 7])
+        except IndexError:
+            try:
+                if buttons[i + 7]:
+                    markup.add(*buttons[i:i + 7])
+            except:
+                for day in range(int(
+                        (len(dates) + week_first_day) / 7 + 1) * 7 - (len(dates) + week_first_day)):
+                    buttons.append(empty_btn)
+                markup.add(*buttons[i:i + 7])
+
     return markup

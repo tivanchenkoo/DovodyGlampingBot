@@ -40,13 +40,13 @@ def generate_month_booking():
 
 
 #                   SET_NEW_VAL
-# with open('glampphoto2.jpg', 'rb') as image_connection:
+# with open('montana-1-optimized.webp', 'rb') as image_connection:
 #     image = image_connection.read()
 # with sqlite3.connect(DB_NAME) as connection:
 #     sqlite_request = """INSERT INTO glamps (image, desc, price, size, rent_calendar) VALUES(?, ?, ?, ?, ?);"""
-#     connection.execute(sqlite_request, (image, """Глемпінг біля річки "Лісова казка"
+#     connection.execute(sqlite_request, (image, """Глемпінг біля річки "Монтана"
 
-# Цей затишний глемпінг розташований біля бушуючої річки, подалі від міста і усіх забот. Незабуваємий досвід для тебе і твоїх друзів або родини!""", 150, 40, json.dumps(generate_month_booking())))
+# Цей затишний глемпінг розташований біля бушуючої річки, подалі від міста і усіх забот. Незабуваємий досвід для тебе і твоїх друзів або родини!""", 150, 41.27, json.dumps(generate_month_booking())))
 #     connection.commit()
 
 #                   SET_EXAMPLE_VAL2
