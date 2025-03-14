@@ -162,6 +162,7 @@ async def number_handler(callback: CallbackQuery):
 async def month_selector_handler(callback: CallbackQuery):
     await bot.delete_message(callback.from_user.id, callback.message.id)
     if callback.data.startswith('calendar_'):
+        print('.')
         await bot.send_message(callback.from_user.id, "choose date", reply_markup=generate_date_selector(
             callback.data.split('_')[1], rent_request['glamp_id']))
     elif callback.data.startswith('calendar2_'):

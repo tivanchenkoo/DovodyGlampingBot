@@ -47,9 +47,13 @@ def generate_callback_month_selector(start_month, start_date):
 
 
 async def generate_date_selector(month, glamp_id, start_month=None, start_date=None):
+    print(month, glamp_id)
     markup = InlineKeyboardMarkup(row_width=7)
+    print('.')
     dates_json = await get_data_from_database()
-    dates = json.loads(dates_json)[int(glamp_id) - 1][6][month]
+    print(len(dates_json))
+    dates = json.loads(dates_json[int(glamp_id) - 1][6][month])
+    print(dates)
 
     top_buttons = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд']
     top_inline_buttons = [InlineKeyboardButton(
