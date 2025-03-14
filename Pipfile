@@ -8,6 +8,7 @@ pytelegrambotapi = "*"
 asyncio = "*"
 autopep8 = "*"
 python-telegram-bot-calendar = "*"
+aiohttp = "*"
 
 [dev-packages]
 
