@@ -1,3 +1,4 @@
+import aiosqlite
 import calendar
 from datetime import datetime, timedelta
 import sqlite3
@@ -60,8 +61,10 @@ def generate_month_booking():
 #     connection.commit()
 
 
-def get_data_from_database():
-    with sqlite3.connect(DB_NAME) as sqlite_connection:
+
+async def get_data_from_database():
+    async with aiosqlite.connect(DB_NAME) as sqlite_connection:
         sqlite_request = """SELECT * FROM glamps"""
-        cursor = sqlite_connection.execute(sqlite_request)
-        return cursor.fetchall()
+        cursor = await sqlite_connection.execute(sqlite_request)
+        data = await cursor.fetchall()
+        return data
