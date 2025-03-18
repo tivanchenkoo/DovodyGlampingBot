@@ -7,7 +7,6 @@ import json
 
 def generate_month_selector():
     markup = InlineKeyboardMarkup(row_width=3)
-    chopped_month = []
     callback_month = calendar.month_name
     ukr_month = ['Січ', 'Лют', 'Бер', 'Квіт', 'Трав',
                  'Чер', 'Лип', 'Серп', 'Вер', 'Жов', 'Лист', 'Груд']
@@ -18,6 +17,7 @@ def generate_month_selector():
                 text=ukr_month[i - 1], callback_data=f"calendar_{callback_month[i]}"))
     for i in range(0, len(buttons), 3):
         markup.add(*buttons[i:i+3])
+    print('no month err')
     return markup
 
 
@@ -47,14 +47,9 @@ def generate_callback_month_selector(start_month, start_date):
 
 
 async def generate_date_selector(month, glamp_id, start_month=None, start_date=None):
-    print(month, glamp_id)
     markup = InlineKeyboardMarkup(row_width=7)
-    print('.')
     dates_json = await get_data_from_database()
-    print(len(dates_json))
-    dates = json.loads(dates_json[int(glamp_id) - 1][6][month])
-    print(dates)
-
+    dates = json.loads(dates_json[int(glamp_id)- 1][6])[month]
     top_buttons = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд']
     top_inline_buttons = [InlineKeyboardButton(
         button, callback_data='ignore') for button in top_buttons]
